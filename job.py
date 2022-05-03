@@ -27,9 +27,6 @@ model_lookup = {
     "bigscience/T0_single_prompt": "t0",
     "bigscience/T0_original_task_only": "t0",
     "bigscience/T0_3B": "t0",
-    "gpt2": "gpt2",
-    "gptj": "gptj",
-    "mgpt": "mgpt",
 }
 
 
@@ -148,13 +145,15 @@ def _template_option(
 
     def _check_value(k, v):
         if k == "modelname":
-            assert v in model_lookup
-            return model_lookup[v]
+            if v in model_lookup:
+                return f"--model {model_lookup[v]} --model_args pretrained={v}"
+            else:
+                return f"--model {v}"
         else:
-            return v
+            return f"--{k} {v}"
 
     joined_options = "  ".join(
-        [f"--{k} {_check_value(k, v)}" for k, v in options.items() if _okay(k, v)]
+        [_check_value(k, v) for k, v in options.items() if _okay(k, v)]
     )
     return f"""python {experiment}.py {joined_options}"""
 
