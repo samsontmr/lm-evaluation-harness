@@ -159,5 +159,6 @@ def _template_option(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--experiment", required=True, type=str)
     parser.add_argument("--date", required=False, default=None)
     main(parser.parse_args())
