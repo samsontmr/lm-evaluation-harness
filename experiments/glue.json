@@ -2,7 +2,7 @@
     "script": "main",
     "use_gpu": true,
     "settings": {
-        "model": [
+        "modelname": [
             "google/t5-small-lm-adapt"
         ],
         "seed": [

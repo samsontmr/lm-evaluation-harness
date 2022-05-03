@@ -10,6 +10,29 @@ import json
 import os
 
 
+model_lookup = {
+    "google/t5-small-lm-adapt": "t5",
+    "google/t5-base-lm-adapt": "t5",
+    "google/t5-large-lm-adapt": "t5",
+    "google/t5-xl-lm-adapt": "t5",
+    "google/t5-xxl-lm-adapt": "t5",
+    "google/mt5-small": "t5",
+    "google/mt5-base": "t5",
+    "google/mt5-large": "t5",
+    "google/mt5-xl": "t5",
+    "google/mt5-xxl": "t5",
+    "bigscience/T0": "t0",
+    "bigscience/T0p": "t0",
+    "bigscience/T0pp": "t0",
+    "bigscience/T0_single_prompt": "t0",
+    "bigscience/T0_original_task_only": "t0",
+    "bigscience/T0_3B": "t0",
+    "gpt2": "gpt2",
+    "gptj": "gptj",
+    "mgpt": "mgpt",
+}
+
+
 def main(FLAGS):
     experiment = FLAGS.experiment
     experiment = experiment.replace(".json", "")
@@ -123,14 +146,18 @@ def _template_option(
             return False
         return True
 
+    def _check_value(k, v):
+        if k == "modelname":
+            assert v in model_lookup
+        return model_lookup[v]
+
     joined_options = "  ".join(
-        [f"--{k} {v}" for k, v in options.items() if _okay(k, v)]
+        [f"--{k} {_check_value(v)}" for k, v in options.items() if _okay(k, v)]
     )
     return f"""python {experiment}.py {joined_options}"""
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--experiment", required=True, type=str)
     parser.add_argument("--date", required=False, default=None)
     main(parser.parse_args())
