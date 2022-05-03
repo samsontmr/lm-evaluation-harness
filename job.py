@@ -22,13 +22,12 @@ def main(FLAGS):
     else:
         jobname = f"{experiment}-{FLAGS.date}"
 
-    jobs = generate_jobs(experiment, jobname, settings)
+    jobs = generate_jobs(experiment, settings)
     is_using_gpu = settings["use_gpu"]
     write_jobs(jobs, jobname, experiment, is_using_gpu)
 
 
-def generate_jobs(experiment, jobname, settings):
-    settings["settings"]["jobname"] = [jobname]
+def generate_jobs(experiment, settings):
     options = list(itertools.product(*settings["settings"].values()))
     keys = list(settings["settings"].keys())
     jobs = []
@@ -87,12 +86,9 @@ def _template_file(texts, experiment, is_using_gpu):
 module load python/3.7.4 cuda/11.3.1 cudnn/8.2.0 gcc/10.2
 source bigs/bin/activate
 
-mkdir -p ./tmp/
 mkdir -p ./out/
 mkdir -p ./err/
 mkdir -p ./log/
-mkdir -p ./models/
-mkdir -p ./results/
 
 {text}
 """
