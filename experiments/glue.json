@@ -1,0 +1,34 @@
+{
+    "script": "main",
+    "use_gpu": true,
+    "settings": {
+        "model": [
+            "google/t5-small-lm-adapt"
+        ],
+        "seed": [
+            42
+        ],
+        "tasks": [
+            "cola",
+            "sst2",
+            "mnli",
+            "qnli",
+            "wnli",
+            "rte",
+            "mrpc",
+            "qqp",
+            "stsb",
+            "boolq",
+            "cb", 
+            "copa",
+            "multirc",
+            "wic",
+            "wsc.fixed",
+            "axg",
+            "axb"
+        ],
+        "limit": [
+            100
+        ]
+    }
+}
