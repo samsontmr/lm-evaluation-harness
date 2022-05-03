@@ -149,10 +149,12 @@ def _template_option(
     def _check_value(k, v):
         if k == "modelname":
             assert v in model_lookup
-        return model_lookup[v]
+            return model_lookup[v]
+        else:
+            return v
 
     joined_options = "  ".join(
-        [f"--{k} {_check_value(v)}" for k, v in options.items() if _okay(k, v)]
+        [f"--{k} {_check_value(k, v)}" for k, v in options.items() if _okay(k, v)]
     )
     return f"""python {experiment}.py {joined_options}"""
 
