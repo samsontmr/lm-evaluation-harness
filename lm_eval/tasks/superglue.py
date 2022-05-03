@@ -169,13 +169,13 @@ class MultiRC(PromptSourceTask):
     def process_results(self, doc, results):
         ll_true_choice, ll_false_choice = results
         pred = ll_true_choice > ll_false_choice
-        return {"acc": (pred, doc)}
+        return {"acc_all": (pred, doc)}
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {"acc_all": True}
 
     def aggregation(self):
-        return {"acc": acc_all}
+        return {"acc_all": acc_all}
 
 
 class ReCoRD(PromptSourceTask):

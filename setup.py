@@ -22,7 +22,7 @@ setuptools.setup(
     install_requires=[
         "promptsource @ git+https://github.com/bigscience-workshop/promptsource@eval-hackathon",
         "wrapt",
-        "nltk",
+        "nltk==3.7",
         "jinja2",
         "black",
         "datasets==2.0.0",
@@ -50,5 +50,5 @@ setuptools.setup(
     dependency_links=[
         "https://github.com/google-research/bleurt/archive/b610120347ef22b494b6d69b4316e303f5932516.zip#egg=bleurt",
     ],
-    extras_require={'dev': [ 'pytest', 'black' ]}
+    extras_require={"dev": ["pytest", "black"]},
 )
