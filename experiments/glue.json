@@ -3,7 +3,9 @@
     "use_gpu": true,
     "settings": {
         "modelname": [
-            "google/t5-small-lm-adapt"
+            "google/t5-xl-lm-adapt",
+            "google/mt5-xl",
+            "bigscience/T0_3B"
         ],
         "seed": [
             42
@@ -25,10 +27,13 @@
             "wic",
             "wsc.fixed",
             "axg",
-            "axb"
+            "hans"
         ],
         "limit": [
             100
+        ],
+        "num_fewshot": [
+            0, 2, 32, 64
         ]
     }
 }
