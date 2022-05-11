@@ -21,7 +21,7 @@ from lm_eval.metrics import (
 from lm_eval import utils, metrics
 from abc import abstractmethod
 
-from metric_impls import comet as comet_impl
+from lm_eval.metric_impls import comet as comet_impl
 
 
 class LM(abc.ABC):

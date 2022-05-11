@@ -45,6 +45,7 @@ def comet_aggregation(data):
     # While we could be predict the comet scores for each row, instead we do it once
     # as a batch because it requires using a model, and it makes more sense to batch
     # the operations.
+    # 1.79G (wmt20-comet-da) + 2.09G (xlm-roberta-large)
     model_path = download_model("wmt20-comet-da")
     model = load_from_checkpoint(model_path)
     if torch.cuda.is_available():
