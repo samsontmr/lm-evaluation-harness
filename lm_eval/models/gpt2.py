@@ -1,6 +1,7 @@
 import transformers
 import torch
 from lm_eval.base import BaseLM
+from accelerate import Accelerator
 
 
 class HFLM(BaseLM):
@@ -20,21 +21,23 @@ class HFLM(BaseLM):
         assert isinstance(pretrained, str)
         assert isinstance(batch_size, int)
 
-        if device:
-            self._device = torch.device(device)
-        else:
-            self._device = (
-                torch.device("cuda")
-                if torch.cuda.is_available()
-                else torch.device("cpu")
-            )
-
         # TODO: update this to be less of a hack once subfolder is fixed in HF
         self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
             pretrained,
             revision=revision + ("/" + subfolder if subfolder is not None else ""),
         )
         self.gpt2.eval()
+        self.accelerator = Accelerator()
+        self.gpt2 = self.accelerator.prepare(self.gpt2)
+        self._device = self.accelerator.device
+        # if device:
+        #     self._device = self.accelerator.device
+        # else:
+        #     self._device = (
+        #         torch.device("cuda")
+        #         if torch.cuda.is_available()
+        #         else torch.device("cpu")
+        #     )
 
         # pretrained tokenizer for neo is broken for now so just hard-coding this to gpt2
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -68,12 +71,12 @@ class HFLM(BaseLM):
         # multithreading and batching
         self.batch_size_per_gpu = batch_size  # todo: adaptive batch size
 
-        # TODO: fix multi-gpu
-        if parallelize:
-            self.gpt2.parallelize()
-            self._device = torch.device("cuda:0")
-        else:
-            self.gpt2.to(self._device)
+        # # TODO: fix multi-gpu
+        # if parallelize:
+        #     self.gpt2.parallelize()
+        #     self._device = torch.device("cuda:0")
+        # else:
+        #     self.gpt2.to(self._device)
 
     @property
     def eot_token(self):
@@ -121,7 +124,7 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            return self.gpt2(inps)[0]
+            return self.gpt2(self.accelerator.prepare(inps))[0]
 
     def _get_stopping_criteria(self, stopping_criteria_ids):
         class MultitokenEOSCriteria(transformers.StoppingCriteria):

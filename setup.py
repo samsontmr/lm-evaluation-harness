@@ -26,6 +26,7 @@ setuptools.setup(
         "nltk",
         "jinja2",
         "black",
+        "accelerate",
         "datasets==2.0.0",
         "click>=7.1",
         "scikit-learn>=0.24.1",
@@ -51,5 +52,5 @@ setuptools.setup(
     dependency_links=[
         "https://github.com/google-research/bleurt/archive/b610120347ef22b494b6d69b4316e303f5932516.zip#egg=bleurt",
     ],
-    extras_require={'dev': [ 'pytest', 'black' ]}
+    extras_require={"dev": ["pytest", "black"]},
 )
