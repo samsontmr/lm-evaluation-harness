@@ -8,6 +8,8 @@ from tqdm import tqdm
 from lm_eval.base import BaseLM
 from lm_eval import utils
 
+from accelerate import Accelerator
+
 
 class HuggingFaceAutoLM(BaseLM):
 
@@ -33,8 +35,13 @@ class HuggingFaceAutoLM(BaseLM):
         self.tokenizer = self.create_auto_tokenizer(
             pretrained, revision, subfolder, tokenizer
         )
-        self.model = self.create_auto_model(pretrained, revision, subfolder)
+
+        self.accelerator = Accelerator()
+        self.model = self.accelerator.prepare(
+            self.create_auto_model(pretrained, revision, subfolder)
+        )
         self.model.eval()
+        self._device = self.accelerator.device
         torch.set_grad_enabled(
             False
         )  # Turn off gradients; we're only running inference.
@@ -42,13 +49,13 @@ class HuggingFaceAutoLM(BaseLM):
         self._max_gen_toks = max_gen_toks
         self._batch_size = batch_size  # todo: adaptive batch size
 
-        # TODO: Fix multi-gpu support.
-        self._device = torch.device(device)
-        if parallelize:
-            self.model.parallelize()
-            self._device = torch.device("cuda:0")
-        else:
-            self.model.to(self._device)
+        # # TODO: Fix multi-gpu support.
+        # self._device = torch.device(device)
+        # if parallelize:
+        #     self.model.parallelize()
+        #     self._device = torch.device("cuda:0")
+        # else:
+        #     self.model.to(self._device)
 
     def create_auto_model(
         self, pretrained: str, revision: str, subfolder: str
@@ -158,6 +165,7 @@ class AutoCausalLM(HuggingFaceAutoLM):
         stopping_criteria = _get_stopping_criteria(
             self.tokenizer, stopping_criteria_ids
         )
+        context = self.accelerator.prepare(context)
         if num_fewshot == 0:
             generations = self.model.generate(
                 context,
@@ -287,13 +295,24 @@ class AutoSeq2SeqLM(HuggingFaceAutoLM):
         returns: a torch tensor of shape [batch, sequence, vocab] with the
         logits returned from the model
         """
-        return self.model(**inputs_tok, labels=targets_tok["input_ids"])
+        return self.model(
+            **{
+                k: v
+                for k, v in zip(
+                    inputs_tok.keys(), self.accelerator.prepare(*inputs_tok.values())
+                )
+            },
+            labels=targets_tok["input_ids"],
+        )
 
     def _model_generate(
         self, context, attention_mask, max_length, stopping_criteria_ids, num_fewshot
     ):
         stopping_criteria = _get_stopping_criteria(
             self.tokenizer, stopping_criteria_ids
+        )
+        context, attention_mask, stopping_criteria_ids = self.accelerator.prepare(
+            context, attention_mask, stopping_criteria_ids
         )
         if num_fewshot == 0:
             generations = self.model.generate(
