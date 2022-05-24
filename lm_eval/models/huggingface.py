@@ -56,6 +56,7 @@ class HuggingFaceAutoLM(BaseLM):
         return self.AUTO_MODEL_CLASS.from_pretrained(
             pretrained,
             revision=revision + ("/" + subfolder if subfolder is not None else ""),
+            device_map="auto",
         )
 
     def create_auto_tokenizer(
