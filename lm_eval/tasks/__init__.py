@@ -21,7 +21,13 @@ from . import huff_post
 from . import lama
 from . import lince
 from . import race
+
 from . import scitail
+from . import bioasq_task_b
+from . import biosses
+from . import gad
+from . import mednli
+
 from . import superglue
 from . import wino_bias
 from . import wmt
@@ -197,8 +203,12 @@ TASK_REGISTRY = {
     # DiaBLa
     "diabla": diabla.DiaBLa,
     
-    # SciTail
+    # BigBio
     "scitail": scitail.SciTailTE,
+    "bioasq_task_b": bioasq_task_b.BioAsqQA,
+    "biosses": biosses.BiossesPAIRS,
+    "gad": gad.GadTEXT,
+    "mednli": mednli.MedNliTE,
 }
 
 
